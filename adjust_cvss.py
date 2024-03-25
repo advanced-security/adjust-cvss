@@ -70,19 +70,17 @@ def adjust_cvss(args):
                             props['security-severity'] = sp
 
         # tool --> driver match
-        for dri in run.get('tool', {}).get('driver', {}):
-            print(dri)
-            for rule in dri.get('rules', []):
-                props = rule.get('properties', [])
-                qip = rule.get('id', [])
-                
-                cvss = props.get('security-severity', None)
+        for rule in run.get('tool', {})['driver'].get('rules', []):
+            props = rule.get('properties', [])
+            qip = rule.get('id', [])
+            
+            cvss = props.get('security-severity', None)
 
-                if cvss:
-                    for idp, sp in args.patterns:
-                        if match(idp, qip):
-                            print('adjusted')
-                            props['security-severity'] = sp
+            if cvss:
+                for idp, sp in args.patterns:
+                    if match(idp, qip):
+                        print('adjusted')
+                        props['security-severity'] = sp
 
     with open(args.output, 'w') as f:
         json.dump(s, f, indent=2)
