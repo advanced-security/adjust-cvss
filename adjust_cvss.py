@@ -55,11 +55,26 @@ def adjust_cvss(args):
         s = json.load(f)
 
     for run in s.get('runs', []):
+        # tool --> extensions match
         for ext in run.get('tool', {}).get('extensions', []):
             for rule in ext.get('rules', []):
                 props = rule.get('properties', [])
 
                 qip = props.get('id', '')
+                cvss = props.get('security-severity', None)
+
+                if cvss:
+                    for idp, sp in args.patterns:
+                        if match(idp, qip):
+                            print('adjusted')
+                            props['security-severity'] = sp
+
+        # tool --> driver match
+        for ext in run.get('tool', {}).get('driver', []):
+            for rule in ext.get('rules', []):
+                props = rule.get('properties', [])
+                qip = rule.get('id', [])
+                
                 cvss = props.get('security-severity', None)
 
                 if cvss:
