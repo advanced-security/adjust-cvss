@@ -70,8 +70,8 @@ def adjust_cvss(args):
                             props['security-severity'] = sp
 
         # tool --> driver match
-        for ext in run.get('tool', {}).get('driver', []):
-            for rule in ext.get('rules', []):
+        for dri in run.get('tool', {}).get('driver', {}):
+            for rule in dri.get('rules', []):
                 props = rule.get('properties', [])
                 qip = rule.get('id', [])
                 
