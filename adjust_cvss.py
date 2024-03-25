@@ -71,6 +71,7 @@ def adjust_cvss(args):
 
         # tool --> driver match
         for dri in run.get('tool', {}).get('driver', {}):
+            print(dri)
             for rule in dri.get('rules', []):
                 props = rule.get('properties', [])
                 qip = rule.get('id', [])
