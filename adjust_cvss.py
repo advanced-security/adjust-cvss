@@ -43,11 +43,11 @@ def adjust_cvss(args):
     args.patterns = [parse_pattern(p) for p in args.patterns if p]
 
     print('Given patterns:')
-    for idp, sp in args.patterns:
+    for input_id_pattern, input_score_pattern in args.patterns:
         print(
             'IDs: {id_pattern}    scores: {score_pattern}'.format(
-                id_pattern=idp,
-                score_pattern=sp
+                id_pattern=input_id_pattern,
+                score_pattern=input_score_pattern
             )
         )
 
@@ -56,31 +56,31 @@ def adjust_cvss(args):
 
     for run in s.get('runs', []):
         # tool --> extensions --> rules match
-        for ext in run.get('tool', {}).get('extensions', []):
-            for rule in ext.get('rules', []):
+        for extension in run.get('tool', {}).get('extensions', []):
+            for rule in extension.get('rules', []):
                 props = rule.get('properties', [])
 
-                qip = props.get('id', '')
+                rule_id = props.get('id', '')
                 cvss = props.get('security-severity', None)
 
                 if cvss:
-                    for idp, sp in args.patterns:
-                        if match(idp, qip):
+                    for input_id_pattern, input_score_pattern in args.patterns:
+                        if match(input_id_pattern, rule_id):
                             print('adjusted')
-                            props['security-severity'] = sp
+                            props['security-severity'] = input_score_pattern
 
         # tool --> driver --> rules match
         for rule in run.get('tool', {})['driver'].get('rules', []):
             props = rule.get('properties', [])
-            qip = rule.get('id', [])
+            rule_id = rule.get('id', [])
             
             cvss = props.get('security-severity', None)
 
             if cvss:
-                for idp, sp in args.patterns:
-                    if match(idp, qip):
+                for input_id_pattern, input_score_pattern in args.patterns:
+                    if match(input_id_pattern, rule_id):
                         print('adjusted')
-                        props['security-severity'] = sp
+                        props['security-severity'] = input_score_pattern
 
     with open(args.output, 'w') as f:
         json.dump(s, f, indent=2)
