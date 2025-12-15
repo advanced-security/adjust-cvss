@@ -18,6 +18,8 @@ on:
 jobs:
   analyze:
     name: Analyze
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     strategy:
@@ -27,10 +29,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@1b168cd39490f61582a9beae412bb7057a6b2c4e # v4.31.8
       with:
         languages: ${{ matrix.language }}
         queries: security-and-quality
@@ -39,13 +41,13 @@ jobs:
         javatest/build
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@1b168cd39490f61582a9beae412bb7057a6b2c4e # v4.31.8
       with:
         upload: False
         output: sarif-results
 
     - name: adjust-cvss
-      uses: advanced-security/adjust-cvss@master
+      uses: ./
       with:
         #patterns: |
         #  -**/*.java
@@ -59,12 +61,12 @@ jobs:
         output: sarif-results/${{ matrix.language }}.sarif
 
     - name: Upload SARIF
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@1b168cd39490f61582a9beae412bb7057a6b2c4e # v4.31.8
       with:
         sarif_file: sarif-results/${{ matrix.language }}.sarif
 
     - name: Upload loc as a Build Artifact
-      uses: actions/upload-artifact@v2.2.0
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
       with:
         name: sarif-results
         path: sarif-results
