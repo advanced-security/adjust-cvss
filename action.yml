@@ -16,7 +16,7 @@ runs:
     - name: adjust
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
-        INPUT: {{ inputs.input }}
+        INPUT: ${{ inputs.input }}
         OUTPUT: ${{ inputs.output }}
         PATTERNS: ${{ inputs.patterns }}
       run: |
