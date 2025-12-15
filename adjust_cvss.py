@@ -51,7 +51,7 @@ def adjust_cvss(args):
             )
         )
 
-    with open(args.input, 'r') as f:
+    with open(args.input, 'r', encoding="utf-8") as f:
         s = json.load(f)
 
     for run in s.get('runs', []):
@@ -82,7 +82,7 @@ def adjust_cvss(args):
                         print('adjusted')
                         props['security-severity'] = input_score_pattern
 
-    with open(args.output, 'w') as f:
+    with open(args.output, 'w', encoding="utf-8") as f:
         json.dump(s, f, indent=2)
 
 
