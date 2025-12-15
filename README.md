@@ -7,49 +7,34 @@ Takes a SARIF file and a list of query id patterns as input and assigns custom [
 The following example sets the cvss score of all queries to `1.2` except for the query with the id `java/xss`. Note that this only affects queries with a `security-severity` metadata field. Therefore, most code quality related queries are not affected:
 
 ```yaml
-name: "CodeQL"
-
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
-jobs:
-  analyze:
-    name: Analyze
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'java' ]
-
-    steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
-        queries: security-and-quality
+        build-mode: ${{ matrix.build-mode }}
 
-    - run: |
-        javatest/build
+    - name: Run manual build steps
+      if: matrix.build-mode == 'manual'
+      shell: bash
+      run: |
+        echo 'If you are using a "manual" build mode for one or more of the' \
+          'languages you are analyzing, replace this with the commands to build' \
+          'your code, for example:'
+        echo '  make bootstrap'
+        echo '  make release'
+        exit 1
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v4
       with:
         output: sarif-results
-        upload: False
+        upload: failure-only
 
     - name: adjust-cvss
-      uses: advanced-security/adjust-cvss@master
+      uses: advanced-security/adjust-cvss@v0.0.1
       with:
         patterns: |
           **:1.2
@@ -58,12 +43,12 @@ jobs:
         output: sarif-results/${{ matrix.language }}.sarif
 
     - name: Upload SARIF
-      uses: github/codeql-action/upload-sarif@v1
+      uses: github/codeql-action/upload-sarif@v4
       with:
         sarif_file: sarif-results/${{ matrix.language }}.sarif
 ```
 
-Note how we provided `upload: False` and `output: sarif-results` to the `analyze` action. That way we can filter the SARIF with the `adjust-cvss` action before uploading it via `upload-sarif`.
+Note how we provided `upload: failure-only` and `output: sarif-results` to the `analyze` action. That way we can filter the SARIF with the `adjust-cvss` action before uploading it via `upload-sarif`.
 
 # Patterns
 
