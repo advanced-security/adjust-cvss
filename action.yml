@@ -14,7 +14,9 @@ runs:
   using: "composite"
   steps:
     - name: adjust
+      env:
+        PATTERNS: ${{ inputs.patterns }}
       run: |
         unset LD_PRELOAD
-        python3 "${{ github.action_path }}/adjust_cvss.py" --input "${{ inputs.input }}" --output "${{ inputs.output }}" --split-lines -- "${{ inputs.patterns }}"
+        python3 "${{ github.action_path }}/adjust_cvss.py" --input "${{ inputs.input }}" --output "${{ inputs.output }}" --split-lines -- "$PATTERNS"
       shell: bash
